@@ -5,16 +5,18 @@ import './App.css';
 export default function CountryMap(props) {
    
     const [map, setMap] = React.useState(null);
+    const [position, setPosition] = React.useState(null);
+
     React.useImperativeHandle(props.refs, () => ({
-        handleFlyTo(newPosition) {
-            handleFlyTo(newPosition)
+        handleFlyTo(parentPosition, childPosition) {
+            handleFlyTo(parentPosition, childPosition)
         }
     })); 
-    function handleFlyTo(newPosition) {
-        console.log(newPosition)
-        map.flyTo(newPosition, 13, {
+    function handleFlyTo(parentPosition, childPosition) {
+        setPosition(childPosition);
+        map.flyTo(parentPosition, 11, {
             duration: 2
-        });
+        });   
     }
    
     return (
@@ -24,11 +26,21 @@ export default function CountryMap(props) {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                <Marker position={props.position}>
-                    <Popup>
-                        {props.popup}
-                    </Popup>
-                </Marker>
+                {
+                    position?position.map((oneposition, index) => {
+                        return (<Marker key={index} position={oneposition.position}>
+                        <Popup>
+                            {oneposition.info}
+                        </Popup>
+                    </Marker>)
+                    })
+                    :
+                    <Marker position={props.position}>
+                        <Popup>
+                            {props.popup}
+                        </Popup>
+                    </Marker>
+                }                
             </MapContainer>
         </div>
 

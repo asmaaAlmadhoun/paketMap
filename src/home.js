@@ -11,6 +11,8 @@ export default function Home() {
     const availableCities = data.countries.find((c) => c.name === selectedCountry);
     const [popup, setPopup] = React.useState(`نص تجريبي`);
     const [position, setPosition] = React.useState([38.9072, -77.0369]);
+    const [positionParent, setPositionParent] = React.useState([38.9072, -77.0369]);
+
     const ref = React.createRef();
 
     const availableNeighborhood = availableCities?.cities?.find(
@@ -24,6 +26,15 @@ export default function Home() {
         );
         setPopup(Neighborhood.info);
         setPosition(Neighborhood.position);
+        ref.current.handleFlyTo(positionParent, Neighborhood.position)
+    }
+    function setSelectedCityElement(newSelectedElement) {
+        setSelectedCity(newSelectedElement.target.value);
+        const city = availableCities?.cities.find(
+            (s) => s.name === newSelectedElement.target.value
+        );
+        setPositionParent(city.position);
+        ref.current.handleFlyTo(city.position, null)
     }
     return (
         <div>
@@ -54,7 +65,7 @@ export default function Home() {
                         <Form.Select
                             placeholder="State"
                             value={selectedCity}
-                            onChange={(e) => setSelectedCity(e.target.value)}
+                            onChange={(e) => setSelectedCityElement(e)}
                         >
                             <option>--المدينة--</option>
                             {availableCities?.cities.map((e, key) => {
@@ -73,9 +84,9 @@ export default function Home() {
                             onChange={(e) => setSelectedElement(e)}
                         >
                             <option>--الحي--</option>
-                            {availableNeighborhood?.neighborhood.map(({ name, info, position }, index) => {
+                            {availableNeighborhood?.neighborhood.map(({ name }, index) => {
                                 return (
-                                    <option value={name} info={info} position={position} key={index}>
+                                    <option value={name} key={index}>
                                         {name}
                                     </option>
                                 );
@@ -83,13 +94,13 @@ export default function Home() {
                         </Form.Select>
                     </Col>
                     <Col>
-                        <button className="btn btn-primary" onClick={() => ref.current.handleFlyTo(position)}>
+                        <button className="btn btn-primary" onClick={() => ref.current.handleFlyTo(positionParent, position)}>
                             انتقل على الخريطة
                         </button>
                     </Col>
                 </Row>
             </Container>
-            <CountryMap refs={ref} popup={popup} position={position} />
+            <CountryMap refs={ref} popup={popup} position={positionParent} />
         </div>
     );
 }
